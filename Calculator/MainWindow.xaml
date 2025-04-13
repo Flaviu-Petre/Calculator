@@ -1,0 +1,240 @@
+﻿<Window x:Class="Calculator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Calculator"
+        mc:Ignorable="d"
+        Title="Calculator" Height="571" Width="363"
+        Background="#F0F0F0"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <!-- Stiluri de bază -->
+        <SolidColorBrush x:Key="PrimaryColor" Color="#3498db"/>
+        <SolidColorBrush x:Key="SecondaryColor" Color="#2980b9"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#e74c3c"/>
+        <SolidColorBrush x:Key="NeutralColor" Color="#ecf0f1"/>
+        <SolidColorBrush x:Key="DarkTextColor" Color="#2c3e50"/>
+        <SolidColorBrush x:Key="LightTextColor" Color="#ffffff"/>
+
+        <!-- Stiluri pentru butoane -->
+        <Style x:Key="StandardButtonStyle" TargetType="Button">
+            <Setter Property="Command" Value="{Binding Path=buttonPressCommand}"/>
+            <Setter Property="Background" Value="{StaticResource NeutralColor}"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkTextColor}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="8"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#D5D5D5"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#BEBEBE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NumberButtonStyle" TargetType="Button" BasedOn="{StaticResource StandardButtonStyle}">
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <Style x:Key="OperatorButtonStyle" TargetType="Button" BasedOn="{StaticResource StandardButtonStyle}">
+            <Setter Property="Background" Value="#E8F4FC"/>
+        </Style>
+
+        <Style x:Key="EqualsButtonStyle" TargetType="Button" BasedOn="{StaticResource StandardButtonStyle}">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="Foreground" Value="{StaticResource LightTextColor}"/>
+        </Style>
+
+        <Style x:Key="ClearButtonStyle" TargetType="Button" BasedOn="{StaticResource StandardButtonStyle}">
+            <Setter Property="Background" Value="#FFE8E8"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+        </Style>
+
+        <Style x:Key="MemoryButtonStyle" TargetType="Button" BasedOn="{StaticResource StandardButtonStyle}">
+            <Setter Property="Background" Value="#F0F7FF"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Stil pentru ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Stil pentru Menu -->
+        <Style TargetType="Menu">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+
+        <Style TargetType="MenuItem">
+            <Setter Property="Padding" Value="8 4"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="White" Margin="0" Padding="0" CornerRadius="10">
+        <DockPanel LastChildFill="True">
+            <!-- Upper meniu -->
+            <Menu x:Name="Meniu" DockPanel.Dock="Top" Margin="10,5,10,0">
+                <MenuItem Header="Calculator">
+                </MenuItem>
+                <MenuItem Header="Help" >
+                    <MenuItem Header="About" Click="About_Click"/>
+                </MenuItem>
+                <MenuItem Header="Options" >
+                    <MenuItem Header="Copy" Command="{Binding CopyCommand}"/>
+                    <MenuItem Header="Paste" Command="{Binding PasteCommand}"/>
+                    <MenuItem Header="Cut" Command="{Binding CutCommand}"/>
+                </MenuItem>
+            </Menu>
+
+            <!-- Main grid -->
+            <Grid x:Name="mainGrid" Margin="10,0,10,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Grid for display -->
+                <Border Grid.Row="0" Background="#F7FBFF" CornerRadius="10" Margin="0,10,0,10">
+                    <Grid x:Name="displayGrid" Height="120" VerticalAlignment="Bottom">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="60"/>
+                            <RowDefinition Height="60"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding Path=KeyPressedString}"
+                             FontSize="20"
+                             TextAlignment="Right"
+                             VerticalAlignment="Bottom"
+                             HorizontalAlignment="Right"
+                             Padding="10"
+                             Height="60" 
+                             Foreground="#505050"
+                             FontFamily="Segoe UI Light"
+                             />
+
+                        <TextBlock Text="{Binding Path=Entered_Number}" 
+                             VerticalAlignment="Bottom" 
+                             HorizontalAlignment="Right" 
+                             FontSize="42"
+                             Grid.Row="1"
+                             Padding="10"
+                             Foreground="#212121"
+                             FontWeight="SemiBold"
+                             />
+                    </Grid>
+                </Border>
+
+                <!-- Memory buttons row -->
+                <Grid x:Name="MemoryButtonsGrid" Grid.Row="1" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="MR" FontSize="14" CommandParameter="MR" Style="{StaticResource MemoryButtonStyle}"/>
+                    <Button Grid.Column="1" Content="M+" FontSize="14" CommandParameter="M+" Style="{StaticResource MemoryButtonStyle}"/>
+                    <Button Grid.Column="2" Content="M-" FontSize="14" CommandParameter="M-" Style="{StaticResource MemoryButtonStyle}"/>
+                    <Button Grid.Column="3" Content="MS" FontSize="14" CommandParameter="MS" Style="{StaticResource MemoryButtonStyle}"/>
+
+                    <!-- ComboBox to display stored memory values -->
+                    <ComboBox x:Name="MemoryComboBox" Grid.Column="4" Width="80"
+                        ItemsSource="{Binding MemoryValues}"
+                        SelectedIndex="{Binding SelectedMemoryIndex, Mode=TwoWay}" 
+                        IsReadOnly="True" 
+                        Margin="5,0,0,0"
+                        />
+                </Grid>
+
+                <!-- Calculator buttons -->
+                <Grid x:Name="CalculatorGrid" Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- First row -->
+                    <Button Grid.Row="0" Grid.Column="0" Content="%" FontSize="18" CommandParameter="%" Style="{StaticResource OperatorButtonStyle}"/>
+                    <Button Grid.Row="0" Grid.Column="1" Content="CE" FontSize="18" CommandParameter="Ce" Style="{StaticResource ClearButtonStyle}"/>
+                    <Button Grid.Row="0" Grid.Column="2" Content="C" FontSize="18" CommandParameter="Clr" Style="{StaticResource ClearButtonStyle}"/>
+                    <Button Grid.Row="0" Grid.Column="3" CommandParameter="Del" Style="{StaticResource ClearButtonStyle}">
+                        <Image Source="/png/delete-315.png" Width="22" Height="22"/>
+                    </Button>
+
+                    <!-- Second row -->
+                    <Button Grid.Row="1" Grid.Column="0" Content="1/x" FontSize="18" CommandParameter="1/x" Style="{StaticResource OperatorButtonStyle}"/>
+                    <Button Grid.Row="1" Grid.Column="1" CommandParameter="x^2" Style="{StaticResource OperatorButtonStyle}">
+                        <Image Source="/png/square-11-256.png" Width="22" Height="22"/>
+                    </Button>
+                    <Button Grid.Row="1" Grid.Column="2" CommandParameter="sqrt" Style="{StaticResource OperatorButtonStyle}">
+                        <Image Source="/png/square-root.png" Width="22" Height="22"/>
+                    </Button>
+                    <Button Grid.Row="1" Grid.Column="3" Content="÷" FontSize="20" CommandParameter="/" Style="{StaticResource OperatorButtonStyle}"/>
+
+                    <!-- Third row -->
+                    <Button Grid.Row="2" Grid.Column="0" Content="7" FontSize="20" CommandParameter="7" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="2" Grid.Column="1" Content="8" FontSize="20" CommandParameter="8" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="2" Grid.Column="2" Content="9" FontSize="20" CommandParameter="9" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="2" Grid.Column="3" Content="×" FontSize="20" CommandParameter="*" Style="{StaticResource OperatorButtonStyle}"/>
+
+                    <!-- Fourth row -->
+                    <Button Grid.Row="3" Grid.Column="0" Content="4" FontSize="20" CommandParameter="4" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="3" Grid.Column="1" Content="5" FontSize="20" CommandParameter="5" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="3" Grid.Column="2" Content="6" FontSize="20" CommandParameter="6" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="3" Grid.Column="3" Content="−" FontSize="20" CommandParameter="-" Style="{StaticResource OperatorButtonStyle}"/>
+
+                    <!-- Fifth row -->
+                    <Button Grid.Row="4" Grid.Column="0" Content="1" FontSize="20" CommandParameter="1" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="4" Grid.Column="1" Content="2" FontSize="20" CommandParameter="2" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="4" Grid.Column="2" Content="3" FontSize="20" CommandParameter="3" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="4" Grid.Column="3" Content="+" FontSize="20" CommandParameter="+" Style="{StaticResource OperatorButtonStyle}"/>
+
+                    <!-- Sixth row -->
+                    <Button Grid.Row="5" Grid.Column="0" CommandParameter="+/-" Style="{StaticResource NumberButtonStyle}">
+                        <Image Source="/png/negation.png" Width="22" Height="22"/>
+                    </Button>
+                    <Button Grid.Row="5" Grid.Column="1" Content="0" FontSize="20" CommandParameter="0" Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="5" Grid.Column="2" Content="." FontSize="20" CommandParameter="." Style="{StaticResource NumberButtonStyle}"/>
+                    <Button Grid.Row="5" Grid.Column="3" Content="=" FontSize="20" CommandParameter="=" Style="{StaticResource EqualsButtonStyle}"/>
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </Border>
+</Window>

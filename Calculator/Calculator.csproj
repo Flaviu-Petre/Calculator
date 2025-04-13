@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Tema_1_Calculator</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="png\delete-315.png" />
+    <None Remove="png\negation.png" />
+    <None Remove="png\square-11-256.png" />
+    <None Remove="png\Square-root.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="png\delete-315.png" />
+    <Resource Include="png\negation.png" />
+    <Resource Include="png\square-11-256.png" />
+    <Resource Include="png\Square-root.png" />
+  </ItemGroup>
+
+</Project>
